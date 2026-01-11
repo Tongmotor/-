@@ -67,9 +67,15 @@
 </head>
 <body class="pb-10">
     
- <div id="display-area" style="padding: 20px; font-family: sans-serif;">
-    <h3>ข้อมูลล่าสุดจากระบบ:</h3>
-    <div id="my-data-list">กำลังโหลดข้อมูล...</div>
+<div id="display-area" class="p-4">
+    <h3 class="text-xl font-bold text-red-600 mb-4 heading-font">
+        <i class="fas fa-database mr-2"></i>ข้อมูลล่าสุดจากระบบ:
+    </h3>
+    <div id="my-data-list" class="space-y-3">
+        <p class="text-gray-400">กำลังเชื่อมต่อฐานข้อมูลระบบ...</p>
+    </div>
+    
+</div>
      
 </div>
     <!-- Header & Dashboard -->
@@ -630,41 +636,64 @@
     </script>
    
 <script>
-    // เปลี่ยน ลิงก์ด้านล่างนี้ เป็นลิงก์ CSV ที่คุณคัดลอกมา
+    // ใช้ลิงก์ที่คุณส่งมา
     const googleSheetCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZKF0bhUgn-6nQzIeuQBmtSvw7-Ly424eEdf-ZXSn2dOVxuV7_xKeEUSYHH5EfysRPYgLR3eg1ZoVo/pub?output=csv';
 
     async function showMyData() {
+        const dataContainer = document.getElementById('my-data-list');
         try {
-            const response = await fetch(googleSheetCSV);
-            const data = await response.text();
+            // เพิ่ม { cache: 'no-store' } เพื่อบังคับให้มือถือโหลดใหม่ ไม่เอาหน้าเก่าที่ค้างอยู่มาโชว์
+            const response = await fetch(googleSheetCSV, { cache: 'no-store' });
+            if (!response.ok) throw new Error('Network response was not ok');
             
-            // แยกข้อมูลเป็นบรรทัด
+            const data = await response.text();
             const rows = data.split('\n');
             let htmlContent = '';
 
-            // วนลูปสร้างรายการ (เริ่มที่ 1 เพื่อข้ามหัวตาราง)
+            // วนลูปเริ่มที่ 1 เพื่อข้ามหัวตาราง
             for (let i = 1; i < rows.length; i++) {
                 if (rows[i].trim() !== '') {
+                    // แยกคอลัมน์
                     const columns = rows[i].split(',');
-                    // แสดงข้อมูลคอลัมน์ที่ 1 และ 2 (ปรับตัวเลขได้ตามต้องการ)
+                    
+                    // ปรับแต่งหน้าตาให้สวยงามแบบการ์ด เข้ากับธีมตงมอเตอร์
                     htmlContent += `
-                        <div style="background: #f4f4f4; padding: 10px; margin-bottom: 5px; border-radius: 5px;">
-                            <b>รายการที่ ${i}:</b> ${columns[0]} | ${columns[1] || ''}
+                        <div class="bg-gray-900 border border-gray-700 p-4 rounded-xl shadow-md mb-3 border-l-4 border-red-600">
+                            <div class="flex justify-between items-center">
+                                <span class="text-red-500 font-bold">รายการที่ ${i}</span>
+                                <span class="text-xs text-gray-500 italic">ตงมอเตอร์</span>
+                            </div>
+                            <div class="mt-2 text-white text-lg">
+                                <b>${columns[0] || 'ไม่มีข้อมูล'}</b> 
+                                <span class="text-gray-400 mx-2">|</span> 
+                                <span class="text-yellow-500">${columns[1] || ''}</span>
+                            </div>
                         </div>`;
                 }
             }
 
-            document.getElementById('my-data-list').innerHTML = htmlContent;
+            if (htmlContent === '') {
+                dataContainer.innerHTML = '<p class="text-white">ไม่พบข้อมูลในระบบ</p>';
+            } else {
+                dataContainer.innerHTML = htmlContent;
+            }
+
         } catch (error) {
-            document.getElementById('my-data-list').innerHTML = 'โหลดข้อมูลไม่สำเร็จ กรุณาเช็คการตั้งค่าแชร์ใน Sheet';
+            console.error('Error:', error);
+            dataContainer.innerHTML = `
+                <div class="bg-red-900/20 p-4 rounded-lg text-red-500 border border-red-800">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    โหลดข้อมูลไม่สำเร็จ (ลองรีเฟรชหน้าจออีกครั้ง)
+                </div>`;
         }
     }
 
-    // สั่งให้ทำงานทันที
-    showMyData();
+    // เรียกใช้งานเมื่อโหลดหน้าเว็บ
+    window.addEventListener('load', showMyData);
 </script>
 </body>
 
 </html>
+
 
 
