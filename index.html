@@ -66,12 +66,12 @@
     </style>
 </head>
 <body class="pb-10">
-
-    <div id="display-area" style="padding: 20px; font-family: sans-serif;">
-        <h3>ข้อมูลล่าสุดจากระบบ:</h3>
-        <div id="my-data-list">กำลังโหลดข้อมูลจาก Google Sheets...</div>
-    </div>
     
+ <div id="display-area" style="padding: 20px; font-family: sans-serif;">
+    <h3>ข้อมูลล่าสุดจากระบบ:</h3>
+    <div id="my-data-list">กำลังโหลดข้อมูล...</div>
+     
+</div>
     <!-- Header & Dashboard -->
     <div class="no-print header-sticky">
         <header class="bg-gray-900 text-white border-b-4 border-red-600 shadow-xl">
@@ -628,11 +628,7 @@
             renderCurrentView(); 
         };
     </script>
-    <div id="display-area" style="padding: 20px; font-family: sans-serif;">
-    <h3>ข้อมูลล่าสุดจากระบบ:</h3>
-    <div id="my-data-list">กำลังโหลดข้อมูล...</div>
-</div>
-
+   
 <script>
     // เปลี่ยน ลิงก์ด้านล่างนี้ เป็นลิงก์ CSV ที่คุณคัดลอกมา
     const googleSheetCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZKF0bhUgn-6nQzIeuQBmtSvw7-Ly424eEdf-ZXSn2dOVxuV7_xKeEUSYHH5EfysRPYgLR3eg1ZoVo/pub?output=csv';
@@ -670,4 +666,5 @@
 </body>
 
 </html>
+
 
