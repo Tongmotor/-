@@ -66,18 +66,7 @@
     </style>
 </head>
 <body class="pb-10">
-    
-<div id="display-area" class="p-4">
-    <h3 class="text-xl font-bold text-red-600 mb-4 heading-font">
-        <i class="fas fa-database mr-2"></i>ข้อมูลล่าสุดจากระบบ:
-    </h3>
-    <div id="my-data-list" class="space-y-3">
-        <p class="text-gray-400">กำลังเชื่อมต่อฐานข้อมูลระบบ...</p>
-    </div>
-    
-</div>
-     
-</div>
+
     <!-- Header & Dashboard -->
     <div class="no-print header-sticky">
         <header class="bg-gray-900 text-white border-b-4 border-red-600 shadow-xl">
@@ -186,6 +175,7 @@
         </div>
     </div>
 
+    <div id="my-data-list"></div>
     <!-- Modal: Add/Edit -->
     <div id="addModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden z-[100] flex items-center justify-center p-4 no-print">
         <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[95vh]">
@@ -636,64 +626,47 @@
     </script>
    
 <script>
-    // ใช้ลิงก์ที่คุณส่งมา
-    const googleSheetCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZKF0bhUgn-6nQzIeuQBmtSvw7-Ly424eEdf-ZXSn2dOVxuV7_xKeEUSYHH5EfysRPYgLR3eg1ZoVo/pub?output=csv';
-
     async function showMyData() {
-        const dataContainer = document.getElementById('my-data-list');
+        const googleSheetCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQZKF0bhUgn-6nQzIeuQBmtSvw7-Ly424eEdf-ZXSn2dOVxuV7_xKeEUSYHH5EfysRPYgLR3eg1ZoVo/pub?output=csv';
+        const container = document.getElementById('my-data-list');
+
         try {
-            // เพิ่ม { cache: 'no-store' } เพื่อบังคับให้มือถือโหลดใหม่ ไม่เอาหน้าเก่าที่ค้างอยู่มาโชว์
-            const response = await fetch(googleSheetCSV, { cache: 'no-store' });
-            if (!response.ok) throw new Error('Network response was not ok');
-            
+            const response = await fetch(googleSheetCSV + '?t=' + new Date().getTime());
             const data = await response.text();
-            const rows = data.split('\n');
+            const rows = data.trim().split('\n');
             let htmlContent = '';
 
-            // วนลูปเริ่มที่ 1 เพื่อข้ามหัวตาราง
             for (let i = 1; i < rows.length; i++) {
                 if (rows[i].trim() !== '') {
-                    // แยกคอลัมน์
                     const columns = rows[i].split(',');
                     
-                    // ปรับแต่งหน้าตาให้สวยงามแบบการ์ด เข้ากับธีมตงมอเตอร์
+                    // ปรับแต่ง HTML ตรงนี้ให้เหมือนปุ่มหรือการ์ดในเว็บคุณ
                     htmlContent += `
-                        <div class="bg-gray-900 border border-gray-700 p-4 rounded-xl shadow-md mb-3 border-l-4 border-red-600">
-                            <div class="flex justify-between items-center">
-                                <span class="text-red-500 font-bold">รายการที่ ${i}</span>
-                                <span class="text-xs text-gray-500 italic">ตงมอเตอร์</span>
+                        <div class="flex items-center justify-between p-4 bg-black/40 border border-gray-700 rounded-xl hover:border-red-500 transition-all">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-10 h-10 bg-red-600/20 rounded-full flex items-center justify-center text-red-500">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">${columns[0]}</p>
+                                    <p class="text-gray-400 text-xs">${columns[1] || ''}</p>
+                                </div>
                             </div>
-                            <div class="mt-2 text-white text-lg">
-                                <b>${columns[0] || 'ไม่มีข้อมูล'}</b> 
-                                <span class="text-gray-400 mx-2">|</span> 
-                                <span class="text-yellow-500">${columns[1] || ''}</span>
-                            </div>
+                            <span class="text-red-500 text-sm"><i class="fas fa-chevron-right"></i></span>
                         </div>`;
                 }
             }
-
-            if (htmlContent === '') {
-                dataContainer.innerHTML = '<p class="text-white">ไม่พบข้อมูลในระบบ</p>';
-            } else {
-                dataContainer.innerHTML = htmlContent;
-            }
-
+            container.innerHTML = htmlContent;
         } catch (error) {
-            console.error('Error:', error);
-            dataContainer.innerHTML = `
-                <div class="bg-red-900/20 p-4 rounded-lg text-red-500 border border-red-800">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    โหลดข้อมูลไม่สำเร็จ (ลองรีเฟรชหน้าจออีกครั้ง)
-                </div>`;
+            container.innerHTML = "ไม่สามารถโหลดข้อมูลได้";
         }
     }
-
-    // เรียกใช้งานเมื่อโหลดหน้าเว็บ
-    window.addEventListener('load', showMyData);
+    window.onload = showMyData;
 </script>
 </body>
 
 </html>
+
 
 
 
